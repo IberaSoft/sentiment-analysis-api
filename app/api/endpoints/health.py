@@ -17,13 +17,13 @@ startup_time = time.time()
 async def health_check():
     """Health check endpoint."""
     uptime = time.time() - startup_time
-    model_loaded = sentiment_model is not None
+    is_model_loaded = sentiment_model is not None
     
     api_requests_total.labels(endpoint="/health", method="GET", status="200").inc()
     
     return HealthResponse(
-        status="healthy" if model_loaded else "unhealthy",
-        model_loaded=model_loaded,
+        status="healthy" if is_model_loaded else "unhealthy",
+        model_loaded=is_model_loaded,
         uptime_seconds=uptime
     )
 
