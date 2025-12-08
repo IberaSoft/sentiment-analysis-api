@@ -1,11 +1,6 @@
 """Gradio app for HuggingFace Spaces demo."""
 import gradio as gr
-from transformers import (
-    pipeline,
-    AutoTokenizer,
-    AutoModelForSequenceClassification,
-    AutoConfig
-)
+from transformers import pipeline, DistilBertTokenizer, DistilBertForSequenceClassification
 import os
 import torch
 
@@ -19,30 +14,17 @@ try:
     # Try to load with token if available (for private models)
     hf_token = os.getenv("HF_TOKEN")
     
-    # First, try to load config to check model type
-    try:
-        config = AutoConfig.from_pretrained(
-            MODEL_NAME,
-            token=hf_token if hf_token else None
-        )
-        print(f"Model config loaded. Model type: {getattr(config, 'model_type', 'unknown')}")
-    except Exception as config_error:
-        print(f"Warning: Could not load config: {config_error}")
-        print("Attempting to load model directly...")
-    
-    # Load model explicitly using AutoModelForSequenceClassification
-    # This works even if config.json is missing model_type
+    # Load using DistilBERT classes directly (bypasses config.json model_type requirement)
     print("Loading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(
+    tokenizer = DistilBertTokenizer.from_pretrained(
         MODEL_NAME,
         token=hf_token if hf_token else None
     )
     
     print("Loading model...")
-    model = AutoModelForSequenceClassification.from_pretrained(
+    model = DistilBertForSequenceClassification.from_pretrained(
         MODEL_NAME,
-        token=hf_token if hf_token else None,
-        trust_remote_code=True  # Allow custom model code if needed
+        token=hf_token if hf_token else None
     )
     
     # Create pipeline from loaded model
