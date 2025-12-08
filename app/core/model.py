@@ -93,12 +93,44 @@ class SentimentModel:
         # Predict
         results = self.classifier(processed_text)
         
-        # Process results
+        # Process results - handle different label formats
         scores = {}
+        label_mapping = {
+            "positive": "positive",
+            "negative": "negative",
+            "neutral": "neutral",
+            "pos": "positive",
+            "neg": "negative",
+            "neu": "neutral",
+            "POSITIVE": "positive",
+            "NEGATIVE": "negative",
+            "NEUTRAL": "neutral",
+            "LABEL_0": "negative",  # Common HF format
+            "LABEL_1": "neutral",
+            "LABEL_2": "positive"
+        }
+        
         for result in results[0]:
-            label = result["label"].lower()
+            label = result["label"]
             score = result["score"]
-            scores[label] = score
+            # Normalize label
+            normalized_label = label_mapping.get(label, label.lower())
+            # Map to standard labels
+            if normalized_label not in ["positive", "negative", "neutral"]:
+                # Try to infer from label name
+                label_lower = label.lower()
+                if "pos" in label_lower:
+                    normalized_label = "positive"
+                elif "neg" in label_lower:
+                    normalized_label = "negative"
+                else:
+                    normalized_label = "neutral"
+            
+            # Accumulate scores (in case of duplicate labels)
+            if normalized_label in scores:
+                scores[normalized_label] = max(scores[normalized_label], score)
+            else:
+                scores[normalized_label] = score
         
         # Ensure all classes are present
         for cls in self.classes:
@@ -153,12 +185,43 @@ class SentimentModel:
             batch_results = self.classifier(batch)
             
             for j, result in enumerate(batch_results):
-                # Process results
+                # Process results - handle different label formats
                 scores = {}
+                label_mapping = {
+                    "positive": "positive",
+                    "negative": "negative",
+                    "neutral": "neutral",
+                    "pos": "positive",
+                    "neg": "negative",
+                    "neu": "neutral",
+                    "POSITIVE": "positive",
+                    "NEGATIVE": "negative",
+                    "NEUTRAL": "neutral",
+                    "LABEL_0": "negative",
+                    "LABEL_1": "neutral",
+                    "LABEL_2": "positive"
+                }
+                
                 for item in result:
-                    label = item["label"].lower()
+                    label = item["label"]
                     score = item["score"]
-                    scores[label] = score
+                    # Normalize label
+                    normalized_label = label_mapping.get(label, label.lower())
+                    # Map to standard labels
+                    if normalized_label not in ["positive", "negative", "neutral"]:
+                        label_lower = label.lower()
+                        if "pos" in label_lower:
+                            normalized_label = "positive"
+                        elif "neg" in label_lower:
+                            normalized_label = "negative"
+                        else:
+                            normalized_label = "neutral"
+                    
+                    # Accumulate scores
+                    if normalized_label in scores:
+                        scores[normalized_label] = max(scores[normalized_label], score)
+                    else:
+                        scores[normalized_label] = score
                 
                 # Ensure all classes are present
                 for cls in self.classes:
