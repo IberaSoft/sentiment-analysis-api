@@ -12,6 +12,8 @@ license: mit
 
 # Customer Sentiment Analysis Demo
 
+# Customer Sentiment Analysis Demo
+
 Interactive demo for analyzing customer review sentiment using a fine-tuned DistilBERT model.
 
 ## Model
