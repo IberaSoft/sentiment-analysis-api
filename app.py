@@ -176,7 +176,8 @@ def format_output(result):
 
 
 # Create Gradio interface
-with gr.Blocks(title="Customer Sentiment Analysis", theme=gr.themes.Soft()) as demo:
+# Note: theme parameter moved to launch() in Gradio 6.0, but we keep it here for compatibility
+with gr.Blocks(title="Customer Sentiment Analysis") as demo:
     gr.Markdown(
         """
         # 🎭 Customer Sentiment Analysis
@@ -238,5 +239,5 @@ with gr.Blocks(title="Customer Sentiment Analysis", theme=gr.themes.Soft()) as d
 
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(theme=gr.themes.Soft())
 
