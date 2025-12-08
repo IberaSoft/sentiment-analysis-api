@@ -14,12 +14,41 @@ Instead of adding workarounds in the code, **fix the model repository** by addin
 
 ## How to Fix
 
+### Step 0: Get Your HuggingFace Token
+
+You need a HuggingFace token to upload files to the model repository.
+
+**How to get it:**
+1. Go to https://huggingface.co/settings/tokens
+2. Click **"New token"**
+3. Name it (e.g., "sentiment-analysis-api")
+4. Select **"Write"** type (needed to upload files)
+5. Click **"Generate token"**
+6. **Copy the token immediately** (you won't see it again!)
+
+The token looks like: `hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+**Set it as environment variable:**
+```bash
+export HF_TOKEN="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+Or use it directly in the command (see Step 1).
+
+📖 **Full guide**: See [docs/HF_TOKEN_GUIDE.md](docs/HF_TOKEN_GUIDE.md) for detailed instructions.
+
 ### Step 1: Run the Fix Script
 
 ```bash
+# Option 1: Using environment variable
+export HF_TOKEN="your_token_here"
+python scripts/fix_model_repo.py \
+  --model-id IberaSoft/customer-sentiment-analyzer
+
+# Option 2: Pass token directly
 python scripts/fix_model_repo.py \
   --model-id IberaSoft/customer-sentiment-analyzer \
-  --token $HF_TOKEN
+  --token hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 This script will:
