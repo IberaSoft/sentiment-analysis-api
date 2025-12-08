@@ -1,12 +1,10 @@
 """Gradio app for HuggingFace Spaces demo."""
 import gradio as gr
-from transformers import pipeline, DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import pipeline
 import os
-import torch
 
 # Initialize model
 MODEL_NAME = os.getenv("MODEL_NAME", "IberaSoft/customer-sentiment-analyzer")
-BASE_MODEL = "distilbert-base-uncased"  # Base model for tokenizer fallback
 
 # Load model
 print(f"Loading model: {MODEL_NAME}")
@@ -15,38 +13,12 @@ try:
     # Try to load with token if available (for private models)
     hf_token = os.getenv("HF_TOKEN")
     
-    # Load tokenizer - try model repo first, fallback to base model
-    print("Loading tokenizer...")
-    try:
-        tokenizer = DistilBertTokenizer.from_pretrained(
-            MODEL_NAME,
-            token=hf_token if hf_token else None,
-            use_fast=True
-        )
-        print(f"✓ Tokenizer loaded from {MODEL_NAME}")
-    except Exception as tokenizer_error:
-        print(f"Warning: Could not load tokenizer from {MODEL_NAME}: {tokenizer_error}")
-        print(f"Falling back to base model tokenizer: {BASE_MODEL}")
-        tokenizer = DistilBertTokenizer.from_pretrained(BASE_MODEL, use_fast=True)
-        print(f"✓ Tokenizer loaded from {BASE_MODEL}")
-    
-    # Load model
-    print("Loading model...")
-    model = DistilBertForSequenceClassification.from_pretrained(
-        MODEL_NAME,
-        token=hf_token if hf_token else None,
-        num_labels=3  # Explicitly set number of labels
-    )
-    print(f"✓ Model loaded from {MODEL_NAME}")
-    
-    # Create pipeline from loaded model
-    print("Creating pipeline...")
+    # Use pipeline directly - it handles model loading automatically
     classifier = pipeline(
         "sentiment-analysis",
-        model=model,
-        tokenizer=tokenizer,
-        return_all_scores=True,
-        device=0 if torch.cuda.is_available() else -1
+        model=MODEL_NAME,
+        token=hf_token if hf_token else None,
+        return_all_scores=True
     )
     print("✓ Model loaded successfully!")
 except Exception as e:
