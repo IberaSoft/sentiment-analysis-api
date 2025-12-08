@@ -1,5 +1,6 @@
 """Health check endpoints."""
 import time
+
 from fastapi import APIRouter
 from starlette.responses import JSONResponse
 
@@ -18,13 +19,13 @@ async def health_check():
     """Health check endpoint."""
     uptime = time.time() - startup_time
     is_model_loaded = sentiment_model is not None
-    
+
     api_requests_total.labels(endpoint="/health", method="GET", status="200").inc()
-    
+
     return HealthResponse(
         status="healthy" if is_model_loaded else "unhealthy",
         model_loaded=is_model_loaded,
-        uptime_seconds=uptime
+        uptime_seconds=uptime,
     )
 
 
@@ -32,15 +33,14 @@ async def health_check():
 async def model_info():
     """Get model information."""
     from app.config import settings
-    
+
     api_requests_total.labels(endpoint="/model/info", method="GET", status="200").inc()
-    
+
     return ModelInfoResponse(
         model_name="customer-sentiment-analyzer",
         version="1.0.0",
         base_model="distilbert-base-uncased",
         classes=["positive", "negative", "neutral"],
         accuracy=0.902,
-        f1_score=0.89
+        f1_score=0.89,
     )
-

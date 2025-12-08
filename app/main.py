@@ -6,8 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app
 
+from app.api.endpoints import batch, health, predict
 from app.config import settings
-from app.api.endpoints import predict, batch, health
 from app.core.model import get_model
 from app.utils.logger import logger
 from app.utils.metrics import model_loaded
@@ -27,9 +27,9 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to start application: {str(e)}", exc_info=True)
         model_loaded.set(0)
         raise
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down application...")
 
@@ -39,7 +39,7 @@ app = FastAPI(
     title=settings.api_title,
     description=settings.api_description,
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -53,21 +53,15 @@ app.add_middleware(
 
 # Include routers
 app.include_router(
-    predict.router,
-    prefix=f"/api/{settings.api_version}",
-    tags=["predictions"]
+    predict.router, prefix=f"/api/{settings.api_version}", tags=["predictions"]
 )
 
 app.include_router(
-    batch.router,
-    prefix=f"/api/{settings.api_version}",
-    tags=["predictions"]
+    batch.router, prefix=f"/api/{settings.api_version}", tags=["predictions"]
 )
 
 app.include_router(
-    health.router,
-    prefix=f"/api/{settings.api_version}",
-    tags=["health"]
+    health.router, prefix=f"/api/{settings.api_version}", tags=["health"]
 )
 
 # Prometheus metrics endpoint
@@ -82,7 +76,7 @@ async def root():
         "message": "Customer Sentiment Analysis API",
         "version": "1.0.0",
         "docs": "/docs",
-        "health": f"/api/{settings.api_version}/health"
+        "health": f"/api/{settings.api_version}/health",
     }
 
 
@@ -90,5 +84,5 @@ async def root():
 async def docs_redirect():
     """Redirect to docs."""
     from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/docs")
 
+    return RedirectResponse(url="/docs")
