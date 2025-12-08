@@ -17,6 +17,11 @@
 - **Fix**: Added `plotly==5.18.0` to `requirements.txt`
 - **Status**: ✅ Fixed
 
+### 4. `@gr.cache` decorator not available
+- **Error**: `AttributeError: module 'gradio' has no attribute 'cache'`
+- **Fix**: Our `app.py` doesn't use `@gr.cache` (removed in Gradio 4.x). The Space needs to use our version of `app.py`
+- **Status**: ✅ Fixed (app.py is correct, Space needs to be updated)
+
 ## Current Requirements for Space
 
 The `requirements.txt` file now includes all necessary dependencies:
