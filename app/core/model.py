@@ -3,7 +3,8 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
+from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                          pipeline)
 
 from app.config import settings
 from app.core.preprocessing import preprocess_text

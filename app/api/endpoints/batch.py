@@ -8,12 +8,9 @@ from app.core.model import get_model
 from app.schemas.request import BatchPredictionRequest
 from app.schemas.response import BatchPredictionItem, BatchPredictionResponse
 from app.utils.logger import logger
-from app.utils.metrics import (
-    api_errors_total,
-    api_requests_total,
-    inference_duration_seconds,
-    sentiment_predictions_total,
-)
+from app.utils.metrics import (api_errors_total, api_requests_total,
+                               inference_duration_seconds,
+                               sentiment_predictions_total)
 
 router = APIRouter()
 
