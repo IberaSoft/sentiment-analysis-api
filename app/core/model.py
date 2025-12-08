@@ -3,8 +3,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 import torch
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                          pipeline)
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 
 from app.config import settings
 from app.core.preprocessing import preprocess_text
@@ -43,9 +42,7 @@ class SentimentModel:
             logger.info(f"Using device: {self.device}")
 
             # Load tokenizer and model
-            tokenizer = AutoTokenizer.from_pretrained(
-                settings.model_name, token=settings.hf_token
-            )
+            tokenizer = AutoTokenizer.from_pretrained(settings.model_name, token=settings.hf_token)
 
             model = AutoModelForSequenceClassification.from_pretrained(
                 settings.model_name, token=settings.hf_token
@@ -166,10 +163,7 @@ class SentimentModel:
 
         if not valid_texts:
             # Return neutral predictions for all
-            return [
-                {"text": text, "sentiment": "neutral", "confidence": 0.5}
-                for text in texts
-            ]
+            return [{"text": text, "sentiment": "neutral", "confidence": 0.5} for text in texts]
 
         # Predict in batches
         batch_size = settings.max_batch_size
@@ -243,9 +237,7 @@ class SentimentModel:
                 result_predictions.append(predictions[prediction_idx])
                 prediction_idx += 1
             else:
-                result_predictions.append(
-                    {"text": text, "sentiment": "neutral", "confidence": 0.5}
-                )
+                result_predictions.append({"text": text, "sentiment": "neutral", "confidence": 0.5})
 
         processing_time = (time.time() - start_time) * 1000
 

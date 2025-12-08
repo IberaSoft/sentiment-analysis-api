@@ -16,8 +16,6 @@ api_requests_total = Counter(
     "api_requests_total", "Total API requests", ["endpoint", "method", "status"]
 )
 
-api_errors_total = Counter(
-    "api_errors_total", "Total API errors", ["endpoint", "error_type"]
-)
+api_errors_total = Counter("api_errors_total", "Total API errors", ["endpoint", "error_type"])
 
 model_loaded = Gauge("model_loaded", "Whether the model is loaded (1) or not (0)")

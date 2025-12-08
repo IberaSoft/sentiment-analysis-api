@@ -20,9 +20,7 @@ class Settings(BaseSettings):
 
     # Device Configuration
     device: Optional[str] = os.getenv("DEVICE", None)
-    device_id: Optional[int] = (
-        int(os.getenv("DEVICE_ID", "0")) if os.getenv("DEVICE_ID") else None
-    )
+    device_id: Optional[int] = int(os.getenv("DEVICE_ID", "0")) if os.getenv("DEVICE_ID") else None
 
     # HuggingFace Token (for private models)
     hf_token: Optional[str] = os.getenv("HF_TOKEN", None)
