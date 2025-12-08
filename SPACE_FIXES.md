@@ -22,6 +22,11 @@
 - **Fix**: Our `app.py` doesn't use `@gr.cache` (removed in Gradio 4.x). The Space needs to use our version of `app.py`
 - **Status**: ✅ Fixed (app.py is correct, Space needs to be updated)
 
+### 5. Model not recognized - missing `model_type` in config.json
+- **Error**: `ValueError: Unrecognized model in IberaSoft/customer-sentiment-analyzer. Should have a model_type key in its config.json`
+- **Fix**: Updated `app.py` to load model explicitly using `AutoModelForSequenceClassification` and `AutoTokenizer` instead of relying on pipeline auto-detection
+- **Status**: ✅ Fixed
+
 ## Current Requirements for Space
 
 The `requirements.txt` file now includes all necessary dependencies:

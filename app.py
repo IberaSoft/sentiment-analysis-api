@@ -1,7 +1,13 @@
 """Gradio app for HuggingFace Spaces demo."""
 import gradio as gr
-from transformers import pipeline
+from transformers import (
+    pipeline,
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    AutoConfig
+)
 import os
+import torch
 
 # Initialize model
 MODEL_NAME = os.getenv("MODEL_NAME", "IberaSoft/customer-sentiment-analyzer")
@@ -12,11 +18,41 @@ classifier = None
 try:
     # Try to load with token if available (for private models)
     hf_token = os.getenv("HF_TOKEN")
+    
+    # First, try to load config to check model type
+    try:
+        config = AutoConfig.from_pretrained(
+            MODEL_NAME,
+            token=hf_token if hf_token else None
+        )
+        print(f"Model config loaded. Model type: {getattr(config, 'model_type', 'unknown')}")
+    except Exception as config_error:
+        print(f"Warning: Could not load config: {config_error}")
+        print("Attempting to load model directly...")
+    
+    # Load model explicitly using AutoModelForSequenceClassification
+    # This works even if config.json is missing model_type
+    print("Loading tokenizer...")
+    tokenizer = AutoTokenizer.from_pretrained(
+        MODEL_NAME,
+        token=hf_token if hf_token else None
+    )
+    
+    print("Loading model...")
+    model = AutoModelForSequenceClassification.from_pretrained(
+        MODEL_NAME,
+        token=hf_token if hf_token else None,
+        trust_remote_code=True  # Allow custom model code if needed
+    )
+    
+    # Create pipeline from loaded model
+    print("Creating pipeline...")
     classifier = pipeline(
         "sentiment-analysis",
-        model=MODEL_NAME,
-        token=hf_token if hf_token else None,
-        return_all_scores=True
+        model=model,
+        tokenizer=tokenizer,
+        return_all_scores=True,
+        device=0 if torch.cuda.is_available() else -1
     )
     print("Model loaded successfully!")
 except Exception as e:
