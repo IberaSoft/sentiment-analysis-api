@@ -1,6 +1,5 @@
 """Text preprocessing utilities."""
 import re
-from typing import Optional
 
 
 def clean_text(text: str) -> str:

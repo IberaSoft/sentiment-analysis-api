@@ -1,5 +1,4 @@
 """Prediction endpoints."""
-import time
 
 from fastapi import APIRouter, HTTPException, Request
 
@@ -21,14 +20,17 @@ router = APIRouter()
 @router.post("/predict", response_model=PredictionResponse)
 async def predict_sentiment(request: PredictionRequest, http_request: Request):
     """Predict sentiment for a single text."""
-    start_time = time.time()
 
     try:
         # Check cache first
         cached_result = prediction_cache.get(request.text)
         if cached_result:
             logger.info("Cache hit", extra={"text_preview": request.text[:50]})
-            api_requests_total.labels(endpoint="/predict", method="POST", status="200").inc()
+            api_requests_total.labels(
+                endpoint="/predict",
+                method="POST",
+                status="200",
+            ).inc()
             return PredictionResponse(**cached_result)
 
         # Get model and predict
@@ -41,7 +43,11 @@ async def predict_sentiment(request: PredictionRequest, http_request: Request):
         # Update metrics
         sentiment_predictions_total.labels(sentiment=result["sentiment"]).inc()
         inference_duration_seconds.observe(result["processing_time_ms"] / 1000)
-        api_requests_total.labels(endpoint="/predict", method="POST", status="200").inc()
+        api_requests_total.labels(
+            endpoint="/predict",
+            method="POST",
+            status="200",
+        ).inc()
 
         # Log prediction
         logger.info(
@@ -57,6 +63,16 @@ async def predict_sentiment(request: PredictionRequest, http_request: Request):
 
     except Exception as e:
         logger.error(f"Error in prediction: {str(e)}", exc_info=True)
-        api_errors_total.labels(endpoint="/predict", error_type=type(e).__name__).inc()
-        api_requests_total.labels(endpoint="/predict", method="POST", status="500").inc()
-        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+        api_errors_total.labels(
+            endpoint="/predict",
+            error_type=type(e).__name__,
+        ).inc()
+        api_requests_total.labels(
+            endpoint="/predict",
+            method="POST",
+            status="500",
+        ).inc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Prediction failed: {str(e)}",
+        )

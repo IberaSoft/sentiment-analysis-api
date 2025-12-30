@@ -1,5 +1,4 @@
 """Response schemas."""
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -15,10 +14,24 @@ class SentimentScores(BaseModel):
 class PredictionResponse(BaseModel):
     """Single prediction response."""
 
-    sentiment: str = Field(..., description="Predicted sentiment (positive, negative, neutral)")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
-    scores: SentimentScores = Field(..., description="Scores for each sentiment class")
-    processing_time_ms: float = Field(..., description="Processing time in milliseconds")
+    sentiment: str = Field(
+        ...,
+        description="Predicted sentiment (positive, negative, neutral)",
+    )
+    confidence: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Confidence score",
+    )
+    scores: SentimentScores = Field(
+        ...,
+        description="Scores for each sentiment class",
+    )
+    processing_time_ms: float = Field(
+        ...,
+        description="Processing time in milliseconds",
+    )
 
 
 class BatchPredictionItem(BaseModel):
@@ -32,10 +45,16 @@ class BatchPredictionItem(BaseModel):
 class BatchPredictionResponse(BaseModel):
     """Batch prediction response."""
 
-    predictions: list[BatchPredictionItem] = Field(..., description="List of predictions")
+    predictions: list[BatchPredictionItem] = Field(
+        ...,
+        description="List of predictions",
+    )
     total_processed: int = Field(..., ge=0)
     avg_confidence: float = Field(..., ge=0.0, le=1.0)
-    processing_time_ms: float = Field(..., description="Processing time in milliseconds")
+    processing_time_ms: float = Field(
+        ...,
+        description="Processing time in milliseconds",
+    )
 
 
 class ModelInfoResponse(BaseModel):

@@ -3,7 +3,6 @@ import json
 import logging
 import sys
 from datetime import datetime
-from typing import Any
 
 from app.config import settings
 

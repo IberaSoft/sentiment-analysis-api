@@ -1,8 +1,6 @@
 """Batch prediction endpoints."""
-import time
 
 from fastapi import APIRouter, HTTPException
-from starlette.responses import JSONResponse
 
 from app.core.model import get_model
 from app.schemas.request import BatchPredictionRequest
@@ -21,12 +19,14 @@ router = APIRouter()
 @router.post("/predict/batch", response_model=BatchPredictionResponse)
 async def predict_batch(batch_request: BatchPredictionRequest):
     """Predict sentiment for multiple texts."""
-    start_time = time.time()
 
     try:
         # Validate batch size
         if len(batch_request.texts) > 100:
-            raise HTTPException(status_code=400, detail="Maximum batch size is 100 texts")
+            raise HTTPException(
+                status_code=400,
+                detail="Maximum batch size is 100 texts",
+            )
 
         # Get model and predict
         model = get_model()
@@ -38,10 +38,16 @@ async def predict_batch(batch_request: BatchPredictionRequest):
 
         # Update metrics
         for pred in predictions:
-            sentiment_predictions_total.labels(sentiment=pred["sentiment"]).inc()
+            sentiment_predictions_total.labels(
+                sentiment=pred["sentiment"],
+            ).inc()
 
         inference_duration_seconds.observe(processing_time / 1000)
-        api_requests_total.labels(endpoint="/predict/batch", method="POST", status="200").inc()
+        api_requests_total.labels(
+            endpoint="/predict/batch",
+            method="POST",
+            status="200",
+        ).inc()
 
         # Log batch prediction
         logger.info(
@@ -63,6 +69,16 @@ async def predict_batch(batch_request: BatchPredictionRequest):
         raise
     except Exception as e:
         logger.error(f"Error in batch prediction: {str(e)}", exc_info=True)
-        api_errors_total.labels(endpoint="/predict/batch", error_type=type(e).__name__).inc()
-        api_requests_total.labels(endpoint="/predict/batch", method="POST", status="500").inc()
-        raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
+        api_errors_total.labels(
+            endpoint="/predict/batch",
+            error_type=type(e).__name__,
+        ).inc()
+        api_requests_total.labels(
+            endpoint="/predict/batch",
+            method="POST",
+            status="500",
+        ).inc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Batch prediction failed: {str(e)}",
+        )

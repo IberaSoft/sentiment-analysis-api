@@ -10,7 +10,10 @@ class Settings(BaseSettings):
     """Application settings."""
 
     # Model Configuration
-    model_name: str = os.getenv("MODEL_NAME", "IberaSoft/customer-sentiment-analyzer")
+    model_name: str = os.getenv(
+        "MODEL_NAME",
+        "IberaSoft/customer-sentiment-analyzer",
+    )
 
     # API Configuration
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
@@ -29,7 +32,7 @@ class Settings(BaseSettings):
     api_version: str = "v1"
     api_title: str = "Customer Sentiment Analysis API"
     api_description: str = (
-        "Production-ready sentiment analysis API powered by fine-tuned DistilBERT"
+        "Production-ready sentiment analysis API powered by fine-tuned " "DistilBERT"
     )
 
     model_config = ConfigDict(env_file=".env", case_sensitive=False)

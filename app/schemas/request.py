@@ -5,12 +5,20 @@ from pydantic import BaseModel, Field
 class PredictionRequest(BaseModel):
     """Single prediction request."""
 
-    text: str = Field(..., description="Text to analyze", min_length=1, max_length=5000)
+    text: str = Field(
+        ...,
+        description="Text to analyze",
+        min_length=1,
+        max_length=5000,
+    )
 
 
 class BatchPredictionRequest(BaseModel):
     """Batch prediction request."""
 
     texts: list[str] = Field(
-        ..., description="List of texts to analyze", min_length=1, max_length=100
+        ...,
+        description="List of texts to analyze",
+        min_length=1,
+        max_length=100,
     )

@@ -1,7 +1,6 @@
 """Response caching utilities."""
 import hashlib
-from functools import lru_cache
-from typing import Optional, Tuple
+from typing import Optional
 
 from app.config import settings
 

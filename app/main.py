@@ -1,5 +1,4 @@
 """FastAPI application main file."""
-import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -52,11 +51,23 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(predict.router, prefix=f"/api/{settings.api_version}", tags=["predictions"])
+app.include_router(
+    predict.router,
+    prefix=f"/api/{settings.api_version}",
+    tags=["predictions"],
+)
 
-app.include_router(batch.router, prefix=f"/api/{settings.api_version}", tags=["predictions"])
+app.include_router(
+    batch.router,
+    prefix=f"/api/{settings.api_version}",
+    tags=["predictions"],
+)
 
-app.include_router(health.router, prefix=f"/api/{settings.api_version}", tags=["health"])
+app.include_router(
+    health.router,
+    prefix=f"/api/{settings.api_version}",
+    tags=["health"],
+)
 
 # Prometheus metrics endpoint
 metrics_app = make_asgi_app()

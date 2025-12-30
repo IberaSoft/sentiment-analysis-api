@@ -1,6 +1,6 @@
 """Model loading and inference."""
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
@@ -42,10 +42,14 @@ class SentimentModel:
             logger.info(f"Using device: {self.device}")
 
             # Load tokenizer and model
-            tokenizer = AutoTokenizer.from_pretrained(settings.model_name, token=settings.hf_token)
+            tokenizer = AutoTokenizer.from_pretrained(
+                settings.model_name,
+                token=settings.hf_token,
+            )
 
             model = AutoModelForSequenceClassification.from_pretrained(
-                settings.model_name, token=settings.hf_token
+                settings.model_name,
+                token=settings.hf_token,
             )
 
             # Move model to device
@@ -83,7 +87,11 @@ class SentimentModel:
             return {
                 "sentiment": "neutral",
                 "confidence": 0.5,
-                "scores": {"positive": 0.33, "negative": 0.33, "neutral": 0.34},
+                "scores": {
+                    "positive": 0.33,
+                    "negative": 0.33,
+                    "neutral": 0.34,
+                },
             }
 
         # Predict
@@ -197,7 +205,11 @@ class SentimentModel:
                     # Normalize label
                     normalized_label = label_mapping.get(label, label.lower())
                     # Map to standard labels
-                    if normalized_label not in ["positive", "negative", "neutral"]:
+                    if normalized_label not in [
+                        "positive",
+                        "negative",
+                        "neutral",
+                    ]:
                         label_lower = label.lower()
                         if "pos" in label_lower:
                             normalized_label = "positive"
@@ -208,7 +220,10 @@ class SentimentModel:
 
                     # Accumulate scores
                     if normalized_label in scores:
-                        scores[normalized_label] = max(scores[normalized_label], score)
+                        scores[normalized_label] = max(
+                            scores[normalized_label],
+                            score,
+                        )
                     else:
                         scores[normalized_label] = score
 

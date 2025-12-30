@@ -3,7 +3,9 @@ from prometheus_client import Counter, Gauge, Histogram
 
 # Prediction metrics
 sentiment_predictions_total = Counter(
-    "sentiment_predictions_total", "Total predictions by sentiment", ["sentiment"]
+    "sentiment_predictions_total",
+    "Total predictions by sentiment",
+    ["sentiment"],
 )
 
 inference_duration_seconds = Histogram(
@@ -13,9 +15,18 @@ inference_duration_seconds = Histogram(
 )
 
 api_requests_total = Counter(
-    "api_requests_total", "Total API requests", ["endpoint", "method", "status"]
+    "api_requests_total",
+    "Total API requests",
+    ["endpoint", "method", "status"],
 )
 
-api_errors_total = Counter("api_errors_total", "Total API errors", ["endpoint", "error_type"])
+api_errors_total = Counter(
+    "api_errors_total",
+    "Total API errors",
+    ["endpoint", "error_type"],
+)
 
-model_loaded = Gauge("model_loaded", "Whether the model is loaded (1) or not (0)")
+model_loaded = Gauge(
+    "model_loaded",
+    "Whether the model is loaded (1) or not (0)",
+)
