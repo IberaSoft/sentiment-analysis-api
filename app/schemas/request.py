@@ -9,5 +9,5 @@ class PredictionRequest(BaseModel):
 
 class BatchPredictionRequest(BaseModel):
     """Batch prediction request."""
-    texts: list[str] = Field(..., description="List of texts to analyze", min_items=1, max_items=100)
+    texts: list[str] = Field(..., description="List of texts to analyze", min_length=1, max_length=100)
 

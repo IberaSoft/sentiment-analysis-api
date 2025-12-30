@@ -1,6 +1,7 @@
 """Application configuration."""
 import os
 from typing import Optional
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -28,10 +29,10 @@ class Settings(BaseSettings):
     api_title: str = "Customer Sentiment Analysis API"
     api_description: str = "Production-ready sentiment analysis API powered by fine-tuned DistilBERT"
     
-    class Config:
-        """Pydantic config."""
-        env_file = ".env"
-        case_sensitive = False
+    model_config = ConfigDict(
+        env_file=".env",
+        case_sensitive=False
+    )
 
 
 settings = Settings()

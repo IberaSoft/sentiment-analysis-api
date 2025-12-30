@@ -1,5 +1,5 @@
 # Gradio and core dependencies for HuggingFace Spaces
-gradio==4.19.0
+gradio==4.44.1
 transformers==4.53.0
 torch==2.8.0
 sentencepiece==0.1.99

@@ -1,8 +1,8 @@
 # Core dependencies
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.5
+pydantic-settings==2.7.1
 
 # ML dependencies
 transformers==4.53.0
@@ -10,7 +10,7 @@ torch==2.8.0
 sentencepiece==0.1.99
 
 # Gradio (for HuggingFace Spaces demo)
-gradio==4.19.0
+gradio==4.44.1
 plotly==5.18.0
 
 # Monitoring
