@@ -1,6 +1,7 @@
 """Train sentiment analysis model."""
 import argparse
 import json
+import os
 from pathlib import Path
 
 import torch
@@ -59,7 +60,10 @@ def train(
     output_dir: str = "./models/customer-sentiment-v1",
     num_epochs: int = 3,
     batch_size: int = 16,
-    learning_rate: float = 2e-5
+    learning_rate: float = 2e-5,
+    push_to_hub: bool = False,
+    hub_repo_name: str = None,
+    hub_token: str = None
 ):
     """Train the model."""
     print(f"Loading base model: {base_model}")
@@ -68,7 +72,9 @@ def train(
     tokenizer = AutoTokenizer.from_pretrained(base_model)
     model = AutoModelForSequenceClassification.from_pretrained(
         base_model,
-        num_labels=3
+        num_labels=3,
+        id2label={0: "negative", 1: "neutral", 2: "positive"},
+        label2id={"negative": 0, "neutral": 1, "positive": 2}
     )
     
     # Load data
@@ -112,6 +118,9 @@ def train(
         load_best_model_at_end=True,
         metric_for_best_model="f1",
         save_total_limit=2,
+        push_to_hub=push_to_hub,
+        hub_model_id=hub_repo_name if push_to_hub else None,
+        hub_token=hub_token if push_to_hub else None,
     )
     
     # Data collator
@@ -131,17 +140,24 @@ def train(
     print("Starting training...")
     trainer.train()
     
-    # Save model
-    print(f"Saving model to {output_dir}")
-    trainer.save_model()
-    tokenizer.save_pretrained(output_dir)
-    
     # Evaluate
     print("Evaluating...")
     eval_results = trainer.evaluate()
     print(f"Evaluation results: {eval_results}")
     
-    print("Training completed!")
+    # Save and optionally push to hub
+    if push_to_hub:
+        print(f"Pushing model to HuggingFace Hub: {hub_repo_name}")
+        trainer.push_to_hub(commit_message="Upload trained model")
+        tokenizer.push_to_hub(hub_repo_name, token=hub_token)
+        print(f"✓ Model uploaded to: https://huggingface.co/{hub_repo_name}")
+    else:
+        print(f"Saving model to {output_dir}")
+        trainer.save_model()
+        tokenizer.save_pretrained(output_dir)
+    
+    print("✓ Training completed!")
+    return eval_results
 
 
 if __name__ == "__main__":
@@ -152,6 +168,9 @@ if __name__ == "__main__":
     parser.add_argument("--num-epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--learning-rate", type=float, default=2e-5)
+    parser.add_argument("--push-to-hub", action="store_true", help="Push model to HuggingFace Hub")
+    parser.add_argument("--hub-repo-name", help="HuggingFace Hub repository name (e.g., username/model-name)")
+    parser.add_argument("--hub-token", help="HuggingFace Hub token (or set HF_TOKEN env var)")
     parser.add_argument("--config", help="Path to config file (optional)")
     
     args = parser.parse_args()
@@ -166,6 +185,15 @@ if __name__ == "__main__":
             args.num_epochs = config.get("num_epochs", args.num_epochs)
             args.batch_size = config.get("batch_size", args.batch_size)
             args.learning_rate = config.get("learning_rate", args.learning_rate)
+            args.push_to_hub = config.get("push_to_hub", args.push_to_hub)
+            args.hub_repo_name = config.get("hub_repo_name", args.hub_repo_name)
+    
+    # Get token from env if not provided
+    hub_token = args.hub_token or os.getenv("HF_TOKEN")
+    
+    # Validate hub arguments
+    if args.push_to_hub and not args.hub_repo_name:
+        parser.error("--hub-repo-name is required when --push-to-hub is set")
     
     train(
         base_model=args.base_model,
@@ -173,6 +201,9 @@ if __name__ == "__main__":
         output_dir=args.output_dir,
         num_epochs=args.num_epochs,
         batch_size=args.batch_size,
-        learning_rate=args.learning_rate
+        learning_rate=args.learning_rate,
+        push_to_hub=args.push_to_hub,
+        hub_repo_name=args.hub_repo_name,
+        hub_token=hub_token
     )
 

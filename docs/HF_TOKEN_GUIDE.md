@@ -1,71 +1,44 @@
-# How to Get Your HuggingFace Token
+# HuggingFace Token Guide
 
 ## What is HF_TOKEN?
 
-The HuggingFace token (`HF_TOKEN`) is an authentication token that allows you to:
-- Access private models and datasets
-- Upload models and datasets to HuggingFace Hub
-- Use HuggingFace APIs and tools
+Authentication token for accessing private models and uploading to HuggingFace Hub.
 
-## How to Get Your Token
+## Get Your Token
 
-### Step 1: Create/Login to HuggingFace Account
+### Step 1: Login
 
-1. Go to [HuggingFace.co](https://huggingface.co)
-2. Click **"Sign Up"** (if new) or **"Log In"** (if you have an account)
-3. Complete the registration/login process
+Go to [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
 
-### Step 2: Generate Access Token
+### Step 2: Create Token
 
-1. **Click on your profile icon** (top right corner)
-2. Select **"Settings"** from the dropdown menu
-3. In the left sidebar, click **"Access Tokens"**
-4. Click **"New token"** button
-5. Configure your token:
-   - **Token name**: Give it a descriptive name (e.g., "sentiment-analysis-api")
-   - **Type**: Select **"Write"** (for uploading models) or **"Read"** (for accessing private models)
-   - For this project, use **"Write"** to upload/fix models
-6. Click **"Generate token"**
+1. Click "New token"
+2. Name: `sentiment-analysis-api`
+3. Type: **Write** (for uploads) or **Read** (for private models)
+4. Click "Generate token"
+5. **Copy immediately** (you can't see it again!)
 
-### Step 3: Copy Your Token
+Token format: `hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
-⚠️ **Important**: Copy the token immediately! You won't be able to see it again.
+## Use Your Token
 
-The token will look something like:
-```
-hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+### Environment Variable
 
-## How to Use the Token
-
-### Option 1: Environment Variable (Recommended)
-
-**Linux/macOS:**
 ```bash
+# Linux/macOS
 export HF_TOKEN="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
 
-**Windows (PowerShell):**
-```powershell
+# Windows PowerShell
 $env:HF_TOKEN="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-**Windows (Command Prompt):**
-```cmd
-set HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-### Option 2: In .env File
-
-Create or edit `.env` file in your project root:
+### .env File
 
 ```bash
 HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-Then load it in your application (Python automatically loads `.env` with `python-dotenv` or `pydantic-settings`).
-
-### Option 3: Pass as Command Line Argument
+### Command Line
 
 ```bash
 python scripts/fix_model_repo.py \
@@ -73,94 +46,41 @@ python scripts/fix_model_repo.py \
   --token hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### Option 4: HuggingFace Spaces Environment Variable
+### HuggingFace Spaces
 
-If using HuggingFace Spaces:
+1. Go to Space Settings → Variables and secrets
+2. Add variable:
+   - Name: `HF_TOKEN`
+   - Value: Your token
+3. Click "Add"
 
-1. Go to your Space: https://huggingface.co/spaces/IberaSoft/sentiment-analyzer-demo
-2. Click **"Settings"** tab
-3. Scroll to **"Variables and secrets"** section
-4. Click **"New variable"**
-5. Set:
-   - **Name**: `HF_TOKEN`
-   - **Value**: Your token (starts with `hf_`)
-6. Click **"Add"**
+## Security
 
-The token will be available as an environment variable in your Space.
+**Never commit tokens to Git!**
 
-## Security Best Practices
+✅ Use `.env` file (add to `.gitignore`)
+✅ Use environment variables
+✅ Use Spaces secrets
+❌ Never hardcode in code
 
-⚠️ **Never commit tokens to Git!**
-
-1. ✅ Use `.env` file and add it to `.gitignore`
-2. ✅ Use environment variables
-3. ✅ Use HuggingFace Spaces secrets
-4. ❌ Never hardcode tokens in code
-5. ❌ Never commit tokens to version control
-
-## Verify Your Token Works
-
-Test your token:
+## Verify Token
 
 ```bash
-# Using huggingface-cli
 huggingface-cli whoami
-
-# Or in Python
-from huggingface_hub import whoami
-print(whoami())
 ```
 
-If it works, you'll see your username. If not, check that:
-- Token is correct
-- Token has the right permissions (Read/Write)
-- Token hasn't been revoked
+Should display your username if working correctly.
 
 ## Token Types
 
-- **Read Token**: Can download private models/datasets
-- **Write Token**: Can upload models/datasets and modify repositories
-- **Admin Token**: Full access (use with caution)
-
-For this project, you need a **Write token** to:
-- Fix the model repository (upload missing files)
-- Upload new model versions
-- Update model files
+- **Read**: Download private models/datasets
+- **Write**: Upload and modify repositories (needed for this project)
 
 ## Troubleshooting
 
-### "Invalid token" error
-- Check that you copied the entire token (starts with `hf_`)
-- Verify token hasn't expired or been revoked
-- Ensure token has correct permissions (Write for uploads)
+**Invalid token**: Verify token starts with `hf_` and has correct permissions
 
-### "Permission denied" error
-- Make sure you own the model repository or have write access
-- Verify token type is "Write" not just "Read"
+**Permission denied**: Ensure you own the repository and token type is "Write"
 
-### Token not found
-- Check environment variable is set: `echo $HF_TOKEN`
-- Verify `.env` file is in the correct location
-- Ensure your code is reading the environment variable correctly
-
-## Quick Reference
-
-**Get Token:**
-1. https://huggingface.co → Profile → Settings → Access Tokens → New token
-
-**Use Token:**
-```bash
-export HF_TOKEN="your_token_here"
-```
-
-**Test Token:**
-```bash
-huggingface-cli whoami
-```
-
-## Links
-
-- [HuggingFace Access Tokens Documentation](https://huggingface.co/docs/hub/security-tokens)
-- [HuggingFace Settings Page](https://huggingface.co/settings/tokens)
-- [HuggingFace Hub Documentation](https://huggingface.co/docs/hub)
+**Token not found**: Check with `echo $HF_TOKEN` or verify `.env` file location
 
