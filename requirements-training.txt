@@ -1,6 +1,6 @@
 # Training dependencies
 transformers==4.35.0
-torch==2.1.0
+torch==2.8.0
 datasets==2.14.6
 scikit-learn==1.3.2
 accelerate==0.24.1
