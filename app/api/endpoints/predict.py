@@ -1,6 +1,6 @@
 """Prediction endpoints."""
 import time
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from app.core.model import get_model
 from app.core.cache import prediction_cache

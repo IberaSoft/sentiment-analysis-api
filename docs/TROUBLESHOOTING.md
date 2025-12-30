@@ -1,259 +1,147 @@
-# Troubleshooting Guide
+# Troubleshooting
 
-Common issues and solutions for the Sentiment Analysis API.
-
-## Model Loading Issues
+## Model Issues
 
 ### Model Not Found
 
-**Symptoms:**
-- `Model not found` error
-- `404 Client Error: Not Found for url`
+**Error**: `Model not found` or `404 Client Error`
 
-**Solutions:**
-1. Verify model name in `.env` file:
-   ```
-   MODEL_NAME=IberaSoft/customer-sentiment-analyzer
-   ```
-2. Check internet connection (model downloads from HuggingFace)
-3. Verify HuggingFace Hub status: https://status.huggingface.co
-4. For private models, ensure `HF_TOKEN` is set
-5. Try downloading manually:
-   ```python
-   from transformers import AutoModel
-   AutoModel.from_pretrained("IberaSoft/customer-sentiment-analyzer")
-   ```
+**Fix:**
+
+```bash
+# Verify model name in .env
+MODEL_NAME=IberaSoft/customer-sentiment-analyzer
+
+# For private models, add token
+HF_TOKEN=your_token_here
+
+# Test manually
+python -c "from transformers import AutoModel; AutoModel.from_pretrained('IberaSoft/customer-sentiment-analyzer')"
+```
 
 ### Model Loading Timeout
 
-**Symptoms:**
-- Model takes too long to load
-- Timeout errors
+**Fix**: Check network speed or pre-download model:
 
-**Solutions:**
-1. Check network connection speed
-2. Increase timeout in Docker/container settings
-3. Pre-download model to local cache:
-   ```python
-   from transformers import AutoModel
-   model = AutoModel.from_pretrained("IberaSoft/customer-sentiment-analyzer", cache_dir="./models")
-   ```
+```python
+from transformers import AutoModel
+AutoModel.from_pretrained(
+    "IberaSoft/customer-sentiment-analyzer", 
+    cache_dir="./models"
+)
+```
 
 ## Performance Issues
 
 ### Slow Inference
 
-**Symptoms:**
-- High latency (>100ms per request)
-- Low throughput
+**Fix**: Enable GPU or optimize batch size:
 
-**Solutions:**
-1. **Use GPU** if available:
-   ```bash
-   DEVICE=cuda DEVICE_ID=0
-   ```
-2. **Enable quantization** (see `training/optimize.py`)
-3. **Batch requests** together instead of single requests
-4. **Increase batch size** in `.env`:
-   ```
-   MAX_BATCH_SIZE=64
-   ```
-5. **Use ONNX runtime** for 2-3x speedup (requires model conversion)
+```bash
+# Use GPU
+DEVICE=cuda DEVICE_ID=0
 
-### High Memory Usage
+# Increase batch size
+MAX_BATCH_SIZE=64
 
-**Symptoms:**
-- Out of memory errors
-- Container killed
+# Or use quantized model (see training/optimize.py)
+```
 
-**Solutions:**
-1. **Reduce batch size**:
-   ```
-   MAX_BATCH_SIZE=16
-   ```
-2. **Use quantized model** (smaller memory footprint)
-3. **Increase Docker memory limits**:
-   ```yaml
-   # docker-compose.yml
-   deploy:
-     resources:
-       limits:
-         memory: 4G
-   ```
-4. **Clear model cache** periodically
-5. **Use CPU** if GPU memory is limited
+### Out of Memory
+
+**Fix**:
+
+```bash
+# Reduce batch size
+MAX_BATCH_SIZE=16
+```
+
+Or increase Docker memory in `docker-compose.yml`:
+
+```yaml
+deploy:
+  resources:
+    limits:
+      memory: 4G
+```
 
 ## API Issues
 
 ### 500 Internal Server Error
 
-**Symptoms:**
-- All requests return 500
-- Error logs show exceptions
+**Fix**: Check logs and health:
 
-**Solutions:**
-1. Check application logs:
-   ```bash
-   docker-compose logs -f api
-   ```
-2. Verify model is loaded:
-   ```bash
-   curl http://localhost:8000/api/v1/health
-   ```
-3. Check environment variables
-4. Verify dependencies are installed correctly
+```bash
+docker-compose logs -f api
+curl http://localhost:8000/api/v1/health
+```
 
-### Invalid Request Errors
+### 422 Validation Error
 
-**Symptoms:**
-- `422 Unprocessable Entity` errors
-- Validation errors
+**Fix**: Verify request format:
 
-**Solutions:**
-1. Check request format matches API schema
-2. Verify `Content-Type: application/json` header
-3. Check text length (max 5000 characters)
-4. For batch requests, ensure batch size ≤ 100
+- Use `Content-Type: application/json` header
+- Text max 5000 characters
+- Batch requests max 100 items
 
 ### CORS Errors
 
-**Symptoms:**
-- Browser shows CORS errors
-- Requests blocked from frontend
+**Fix**: CORS enabled by default. For production, restrict in `app/main.py`:
 
-**Solutions:**
-1. CORS is enabled by default for all origins
-2. For production, restrict origins in `app/main.py`:
-   ```python
-   app.add_middleware(
-       CORSMiddleware,
-       allow_origins=["https://yourdomain.com"],
-       ...
-   )
-   ```
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://yourdomain.com"]
+)
+```
 
 ## Docker Issues
 
 ### Container Won't Start
 
-**Symptoms:**
-- Container exits immediately
-- `docker ps` shows no running containers
+**Fix**: Check logs:
 
-**Solutions:**
-1. Check logs:
-   ```bash
-   docker logs sentiment-api
-   ```
-2. Verify Dockerfile syntax
-3. Check port availability:
-   ```bash
-   lsof -i :8000
-   ```
-4. Verify environment variables
+```bash
+docker logs sentiment-api
+
+# Check port availability
+lsof -i :8000
+```
 
 ### Image Build Fails
 
-**Symptoms:**
-- `docker build` fails
-- Dependency installation errors
+**Fix**: Clear cache and rebuild:
 
-**Solutions:**
-1. Check internet connection
-2. Verify Python version (3.11+)
-3. Clear Docker cache:
-   ```bash
-   docker build --no-cache -t sentiment-api:latest .
-   ```
-4. Check Dockerfile for syntax errors
+```bash
+docker build --no-cache -t sentiment-api:latest .
+```
 
-## Network Issues
+## Connection Issues
 
-### Cannot Connect to API
+### Cannot Connect
 
-**Symptoms:**
-- Connection refused
-- Timeout errors
+**Fix**:
 
-**Solutions:**
-1. Verify API is running:
-   ```bash
-   curl http://localhost:8000/api/v1/health
-   ```
-2. Check firewall settings
-3. Verify port mapping in Docker:
-   ```bash
-   docker ps
-   # Should show 0.0.0.0:8000->8000/tcp
-   ```
-4. Check if port is already in use:
-   ```bash
-   lsof -i :8000
-   ```
+```bash
+# Verify API is running
+curl http://localhost:8000/api/v1/health
 
-## Logging Issues
+# Check port mapping
+docker ps
 
-### No Logs Appearing
+# Check if port is in use
+lsof -i :8000
+```
 
-**Symptoms:**
-- Logs not visible
-- Empty log files
+## Common Errors
 
-**Solutions:**
-1. Check log level in `.env`:
-   ```
-   LOG_LEVEL=DEBUG
-   ```
-2. Verify logging configuration in `app/utils/logger.py`
-3. Check Docker logs:
-   ```bash
-   docker-compose logs -f
-   ```
+**ModuleNotFoundError**: Run from project root or set PYTHONPATH
 
-## Testing Issues
+**CUDA out of memory**: Reduce batch size or switch to CPU
 
-### Tests Failing
+**Connection timeout**: Check network and HuggingFace Hub status
 
-**Symptoms:**
-- `pytest` fails
-- Import errors
+**Tests failing**: Install dev dependencies with `pip install -r requirements-dev.txt`
 
-**Solutions:**
-1. Install dev dependencies:
-   ```bash
-   pip install -r requirements-dev.txt
-   ```
-2. Run tests with verbose output:
-   ```bash
-   pytest -v
-   ```
-3. Check Python version (3.11+)
-4. Verify test environment setup
-
-## Getting Help
-
-If you're still experiencing issues:
-
-1. Check the [GitHub Issues](https://github.com/IberaSoft/sentiment-analysis-api/issues)
-2. Review application logs for detailed error messages
-3. Verify your environment matches the requirements
-4. Check HuggingFace model page for model-specific issues
-
-## Common Error Messages
-
-### `ModuleNotFoundError: No module named 'app'`
-
-**Solution:** Run from project root directory or set `PYTHONPATH`
-
-### `CUDA out of memory`
-
-**Solution:** Reduce batch size or use CPU
-
-### `Connection timeout`
-
-**Solution:** Check network connection and HuggingFace Hub status
-
-### `Invalid model identifier`
-
-**Solution:** Verify model name and HuggingFace token (for private models)
+**No logs**: Set `LOG_LEVEL=DEBUG` in `.env` and check `docker-compose logs -f`
 

@@ -61,8 +61,7 @@ def test_model_info_endpoint(client):
     assert "classes" in data
 
 
-@patch('app.core.model.sentiment_model')
-def test_predict_endpoint(client, mock_model):
+def test_predict_endpoint(client):
     """Test predict endpoint."""
     # Mock the model
     mock_model_instance = Mock()
@@ -72,9 +71,10 @@ def test_predict_endpoint(client, mock_model):
         "scores": {"positive": 0.95, "negative": 0.03, "neutral": 0.02},
         "processing_time_ms": 35.0
     }
-    mock_model = mock_model_instance
     
-    with patch('app.api.endpoints.predict.get_model', return_value=mock_model_instance):
+    with patch('app.api.endpoints.predict.get_model', return_value=mock_model_instance), \
+         patch('app.api.endpoints.predict.prediction_cache') as mock_cache:
+        mock_cache.get.return_value = None  # No cache hit
         response = client.post(
             "/api/v1/predict",
             json={"text": "This is great!"}
@@ -85,8 +85,7 @@ def test_predict_endpoint(client, mock_model):
         assert data["confidence"] == 0.95
 
 
-@patch('app.core.model.sentiment_model')
-def test_batch_predict_endpoint(client, mock_model):
+def test_batch_predict_endpoint(client):
     """Test batch predict endpoint."""
     mock_model_instance = Mock()
     mock_model_instance.predict_batch.return_value = (
@@ -96,7 +95,6 @@ def test_batch_predict_endpoint(client, mock_model):
         ],
         50.0
     )
-    mock_model = mock_model_instance
     
     with patch('app.api.endpoints.batch.get_model', return_value=mock_model_instance):
         response = client.post(

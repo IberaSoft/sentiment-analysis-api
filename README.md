@@ -9,8 +9,6 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-![Demo](docs/images/api-demo.gif)
-
 ## 🎯 What I learned with this project:
 
 - ✅ **HuggingFace Expertise**: Model fine-tuning, dataset creation, model hub publishing
@@ -56,17 +54,12 @@ graph LR
 
 ### Try the Live Demo
 
-**🎮 Interactive Demo**: [HuggingFace Spaces](https://huggingface.co/spaces/IberaSoft/sentiment-analyzer-demo)
+**🎮 [Interactive Demo on HuggingFace Spaces](https://huggingface.co/spaces/IberaSoft/sentiment-analyzer-demo)**
 
-### Use the API
+### Run Locally
 
-**Option 1: Docker (Recommended)**
+**Docker (Recommended)**
 ```bash
-# Pull and run
-docker pull IberaSoft/sentiment-api:latest
-docker run -p 8000:8000 IberaSoft/sentiment-api:latest
-
-# Or build from source
 git clone https://github.com/IberaSoft/sentiment-analysis-api.git
 cd sentiment-analysis-api
 docker-compose up -d
@@ -77,136 +70,60 @@ curl -X POST "http://localhost:8000/api/v1/predict" \
   -d '{"text": "This product is amazing!"}'
 ```
 
-**Option 2: Local Installation**
+**Local Development**
 ```bash
-# Clone repository
-git clone https://github.com/IberaSoft/sentiment-analysis-api.git
-cd sentiment-analysis-api
-
-# Install dependencies
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-
-# Run API
 uvicorn app.main:app --reload --port 8000
-
-# Visit http://localhost:8000/docs for interactive API docs
 ```
 
-### Use the Model Directly
+Visit `http://localhost:8000/docs` for interactive API documentation.
+
+### Use Model Directly
 ```python
 from transformers import pipeline
 
-# Load model
 classifier = pipeline(
     "sentiment-analysis",
     model="IberaSoft/customer-sentiment-analyzer"
 )
 
-# Analyze sentiment
 result = classifier("This product exceeded my expectations!")
-print(result)
-# [{'label': 'positive', 'score': 0.9823}]
+print(result)  # [{'label': 'positive', 'score': 0.9823}]
 ```
 
-## 📡 API Documentation
+## 📡 API Overview
 
-### Base URL
-```
-http://localhost:8000/api/v1
-```
+**Base URL**: `http://localhost:8000/api/v1`
 
-### Endpoints
+**Interactive Docs**: Visit `/docs` for Swagger UI
 
-#### 1. Single Prediction
+### Quick Example
+
 ```bash
-POST /predict
-```
+# Single prediction
+curl -X POST "http://localhost:8000/api/v1/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Great product!"}'
 
-**Request**:
-```json
-{
-  "text": "Great product, highly recommend!"
-}
-```
-
-**Response**:
-```json
+# Response
 {
   "sentiment": "positive",
   "confidence": 0.94,
-  "scores": {
-    "positive": 0.94,
-    "negative": 0.03,
-    "neutral": 0.03
-  },
+  "scores": {"positive": 0.94, "negative": 0.03, "neutral": 0.03},
   "processing_time_ms": 35
 }
 ```
 
-#### 2. Batch Prediction
-```bash
-POST /predict/batch
-```
+### Main Endpoints
 
-**Request**:
-```json
-{
-  "texts": [
-    "Excellent service!",
-    "Terrible experience.",
-    "It's okay, nothing special."
-  ]
-}
-```
+- `POST /predict` - Analyze single text
+- `POST /predict/batch` - Analyze multiple texts (max 100)
+- `GET /model/info` - Model information and metrics
+- `GET /health` - Health check
 
-**Response**:
-```json
-{
-  "predictions": [
-    {"text": "Excellent service!", "sentiment": "positive", "confidence": 0.96},
-    {"text": "Terrible experience.", "sentiment": "negative", "confidence": 0.91},
-    {"text": "It's okay, nothing special.", "sentiment": "neutral", "confidence": 0.78}
-  ],
-  "total_processed": 3,
-  "avg_confidence": 0.88,
-  "processing_time_ms": 87
-}
-```
-
-#### 3. Model Info
-```bash
-GET /model/info
-```
-
-**Response**:
-```json
-{
-  "model_name": "customer-sentiment-analyzer",
-  "version": "1.0.0",
-  "base_model": "distilbert-base-uncased",
-  "classes": ["positive", "negative", "neutral"],
-  "accuracy": 0.902,
-  "f1_score": 0.89
-}
-```
-
-#### 4. Health Check
-```bash
-GET /health
-```
-
-**Response**:
-```json
-{
-  "status": "healthy",
-  "model_loaded": true,
-  "uptime_seconds": 3600
-}
-```
-
-### Interactive API Docs
-
-Visit **http://localhost:8000/docs** for Swagger UI with live testing.
+**Full API documentation**: See [docs/API.md](docs/API.md)
 
 ## 📊 Model Performance
 
@@ -345,10 +262,12 @@ sentiment-analysis-api/
 │   └── 03_error_analysis.ipynb
 │
 ├── docs/
-│   ├── API.md
-│   ├── TRAINING.md
-│   ├── DEPLOYMENT.md
-│   └── TROUBLESHOOTING.md
+│   ├── API.md                  # API reference
+│   ├── TRAINING.md             # Model training guide
+│   ├── DEPLOYMENT.md           # Deployment options
+│   ├── SPACES_GUIDE.md         # HuggingFace Spaces setup
+│   ├── HF_TOKEN_GUIDE.md       # Token setup guide
+│   └── TROUBLESHOOTING.md      # Common issues & solutions
 │
 ├── .github/
 │   └── workflows/
@@ -366,282 +285,93 @@ sentiment-analysis-api/
 
 ## 💻 Development
 
-### Setup Development Environment
+### Setup
+
 ```bash
-# Clone repository
 git clone https://github.com/IberaSoft/sentiment-analysis-api.git
 cd sentiment-analysis-api
-
-# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
+source venv/bin/activate
 pip install -r requirements-dev.txt
-
-# Set up pre-commit hooks
 pre-commit install
 ```
 
-### Training the Model
+### Train Model
+
 ```bash
-# 1. Prepare dataset
 cd training
-python prepare_dataset.py \
-  --output-dir ./data \
-  --train-size 15000 \
-  --val-size 3000 \
-  --test-size 2000
+python prepare_dataset.py --output-dir ./data
+python train.py --config configs/training_config.yaml
 
-# 2. Train model
-python train.py \
-  --config configs/training_config.yaml \
-  --output-dir ./models/customer-sentiment-v1
-
-# 3. Evaluate model
-python evaluate.py \
-  --model-dir ./models/customer-sentiment-v1 \
-  --test-data ./data/test.jsonl
-
-# 4. Upload to HuggingFace
-python ../scripts/upload_to_hf.py \
-  --model-dir ./models/customer-sentiment-v1 \
-  --repo-name IberaSoft/customer-sentiment-analyzer
+python evaluate.py --model-dir ./models/customer-sentiment-v1
+python ../scripts/upload_to_hf.py --model-dir ./models/customer-sentiment-v1
 ```
 
-### Running Tests
+**Full training guide**: See [docs/TRAINING.md](docs/TRAINING.md)
+
+### Run Tests
+
 ```bash
-# Unit tests
-pytest tests/unit/ -v
-
-# Integration tests
-pytest tests/integration/ -v
-
-# All tests with coverage
-pytest tests/ --cov=app --cov-report=html
-
-# Load tests
-locust -f tests/load/locustfile.py --host=http://localhost:8000
+pytest tests/ -v                          # All tests
+pytest tests/ --cov=app --cov-report=html # With coverage
 ```
 
-### Running Locally
+## 🚀 Deployment
+
+### Docker
+
 ```bash
-# Start API
-uvicorn app.main:app --reload --port 8000
-
-# In another terminal, test
-curl -X POST "http://localhost:8000/api/v1/predict" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Amazing product!"}'
-```
-
-## 🐳 Docker Deployment
-
-### Build and Run
-```bash
-# Build image
-docker build -t sentiment-api:latest .
-
-# Run container
-docker run -d \
-  --name sentiment-api \
-  -p 8000:8000 \
-  -e MODEL_NAME=IberaSoft/customer-sentiment-analyzer \
-  sentiment-api:latest
-
-# Check logs
-docker logs -f sentiment-api
-```
-
-### Docker Compose
-```bash
-# Start all services
 docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
 ```
 
-### Environment Variables
-```bash
-# Required
-MODEL_NAME=IberaSoft/customer-sentiment-analyzer
+### HuggingFace Spaces
 
-# Optional
-LOG_LEVEL=INFO                   # DEBUG, INFO, WARNING, ERROR
-MAX_BATCH_SIZE=32                # Maximum batch size
-CACHE_SIZE=1000                  # LRU cache size
-WORKERS=2                        # Number of workers
-```
-
-## 🚀 Production Deployment
-
-### Option 1: HuggingFace Spaces (Easiest)
-
-See the live demo: [HuggingFace Spaces](https://huggingface.co/spaces/IberaSoft/sentiment-analyzer-demo)
-
-**Setup**:
 1. Fork this repository
-2. Create a new Space on HuggingFace
-3. Connect your GitHub repo
-4. Space will auto-deploy!
+2. Create Space on HuggingFace
+3. Connect GitHub repo
+4. Auto-deploys!
 
-### Option 2: Cloud VPS
-```bash
-# On your server (DigitalOcean, Linode, etc.)
-git clone https://github.com/IberaSoft/sentiment-analysis-api.git
-cd sentiment-analysis-api
+**Spaces guide**: See [docs/SPACES_GUIDE.md](docs/SPACES_GUIDE.md)
 
-# Start with Docker Compose
-docker-compose up -d
+### Cloud Deployment
 
-# Setup nginx reverse proxy
-sudo apt install nginx
-sudo nano /etc/nginx/sites-available/sentiment-api
+Supports AWS, GCP, Azure, DigitalOcean, and more.
 
-# Add configuration:
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://localhost:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-
-sudo ln -s /etc/nginx/sites-available/sentiment-api /etc/nginx/sites-enabled/
-sudo systemctl restart nginx
-```
-
-### Option 3: AWS/GCP/Azure
-
-See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for detailed cloud deployment guides.
+**Full deployment guide**: See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 ## 📈 Monitoring
 
-### Prometheus Metrics
+**Metrics**: Available at `/metrics` (Prometheus format)
 
-Available at `http://localhost:8000/metrics`
-
-**Key Metrics**:
-- `sentiment_predictions_total` - Total predictions by sentiment
-- `inference_duration_seconds` - Inference latency histogram
-- `api_requests_total` - Total API requests
-- `api_errors_total` - Total API errors
-
-### Logging
-
-Logs are structured JSON for easy parsing:
-```json
-{
-  "timestamp": "2026-01-15T10:30:45.123Z",
-  "level": "INFO",
-  "message": "Prediction made",
-  "sentiment": "positive",
-  "confidence": 0.94,
-  "processing_time_ms": 35,
-  "request_id": "abc123"
-}
-```
+**Logging**: Structured JSON logs for easy parsing
 
 ## 🔧 Customization
 
-### Fine-tune on Your Data
-```python
-# 1. Prepare your dataset
-from datasets import Dataset
+Fine-tune on your own data:
 
-data = {
-    "text": ["your review 1", "your review 2", ...],
-    "label": [2, 0, ...]  # 0=negative, 1=neutral, 2=positive
-}
-
-dataset = Dataset.from_dict(data)
-dataset.push_to_hub("your-username/your-dataset")
-
-# 2. Fine-tune
+```bash
 python training/train.py \
   --base-model IberaSoft/customer-sentiment-analyzer \
   --dataset your-username/your-dataset \
   --output-dir ./models/custom-model
-
-# 3. Update API to use your model
-# Edit app/config.py: MODEL_NAME = "your-username/custom-model"
 ```
 
-### Add Custom Preprocessing
-```python
-# app/core/preprocessing.py
+See [docs/TRAINING.md](docs/TRAINING.md) for details.
 
-def custom_preprocess(text: str) -> str:
-    """Add your custom preprocessing steps"""
-    # Remove specific patterns
-    text = re.sub(r'pattern', '', text)
-    
-    # Add domain-specific handling
-    text = handle_domain_terms(text)
-    
-    return text
-```
+## 📚 Documentation
 
-## 🐛 Troubleshooting
+- **[API Reference](docs/API.md)** - Complete API documentation
+- **[Training Guide](docs/TRAINING.md)** - Train and fine-tune the model
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Deploy to production
+- **[Spaces Guide](docs/SPACES_GUIDE.md)** - HuggingFace Spaces setup
+- **[Token Guide](docs/HF_TOKEN_GUIDE.md)** - HuggingFace token setup
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues & solutions
 
-<details>
-<summary><b>Model not loading</b></summary>
+## 🔗 Links
 
-**Symptoms**: `Model not found` error
-
-**Solutions**:
-1. Check model name is correct in `.env`
-2. Verify internet connection (model downloads from HuggingFace)
-3. Check HuggingFace Hub status
-4. Try downloading manually:
-```python
-from transformers import AutoModel
-AutoModel.from_pretrained("IberaSoft/customer-sentiment-analyzer")
-```
-</details>
-
-<details>
-<summary><b>Slow inference</b></summary>
-
-**Solutions**:
-1. Use GPU if available (set `device=0` in config)
-2. Enable quantization (see [optimize.py](training/optimize.py))
-3. Batch requests together
-4. Use ONNX runtime for 2-3x speedup
-</details>
-
-<details>
-<summary><b>Out of memory errors</b></summary>
-
-**Solutions**:
-1. Reduce batch size in `.env`
-2. Use quantized model
-3. Increase Docker memory limits
-4. Clear model cache periodically
-</details>
-
-See [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for more.
-
-## 📚 Resources
-
-### Documentation
-- 📖 [API Reference](docs/API.md)
-- 🎓 [Training Guide](docs/TRAINING.md)
-- 🚀 [Deployment Guide](docs/DEPLOYMENT.md)
-- 🔧 [Troubleshooting](docs/TROUBLESHOOTING.md)
-
-### External Links
-- 🤗 [HuggingFace Model](https://huggingface.co/IberaSoft/customer-sentiment-analyzer)
-- 📊 [Dataset](https://huggingface.co/datasets/IberaSoft/ecommerce-reviews-sentiment)
+- 🤗 [Model on HuggingFace](https://huggingface.co/IberaSoft/customer-sentiment-analyzer)
+- 📊 [Dataset on HuggingFace](https://huggingface.co/datasets/IberaSoft/ecommerce-reviews-sentiment)
 - 🎮 [Live Demo](https://huggingface.co/spaces/IberaSoft/sentiment-analyzer-demo)
-- 📝 [Blog Post](https://yourblog.com/sentiment-analysis-project)
 
 ## 🗺️ Roadmap
 
