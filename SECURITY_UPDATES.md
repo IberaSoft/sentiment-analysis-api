@@ -83,9 +83,9 @@ All unit tests pass successfully after updates:
 ## Affected Files
 
 ### Requirements Files
-- `requirements.txt` - Main application dependencies
-- `requirements-spaces.txt` - HuggingFace Spaces dependencies
+- `requirements.txt` - Main application dependencies (used by both API and HuggingFace Spaces)
 - `requirements-training.txt` - Training dependencies
+- **Removed**: `requirements-spaces.txt` (consolidated into `requirements.txt`)
 
 ### Code Files
 - `app/config.py` - Configuration class
