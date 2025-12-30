@@ -34,7 +34,9 @@ async def predict_batch(batch_request: BatchPredictionRequest):
 
         # Calculate average confidence
         total_confidence = sum(p["confidence"] for p in predictions)
-        avg_confidence = total_confidence / len(predictions) if predictions else 0.0
+        avg_confidence = (
+            total_confidence / len(predictions) if predictions else 0.0
+        )
 
         # Update metrics
         for pred in predictions:

@@ -23,7 +23,9 @@ class Settings(BaseSettings):
 
     # Device Configuration
     device: Optional[str] = os.getenv("DEVICE", None)
-    device_id: Optional[int] = int(os.getenv("DEVICE_ID", "0")) if os.getenv("DEVICE_ID") else None
+    device_id: Optional[int] = (
+        int(os.getenv("DEVICE_ID", "0")) if os.getenv("DEVICE_ID") else None
+    )
 
     # HuggingFace Token (for private models)
     hf_token: Optional[str] = os.getenv("HF_TOKEN", None)
@@ -32,7 +34,8 @@ class Settings(BaseSettings):
     api_version: str = "v1"
     api_title: str = "Customer Sentiment Analysis API"
     api_description: str = (
-        "Production-ready sentiment analysis API powered by fine-tuned " "DistilBERT"
+        "Production-ready sentiment analysis API powered by "
+        "fine-tuned DistilBERT"
     )
 
     model_config = ConfigDict(env_file=".env", case_sensitive=False)

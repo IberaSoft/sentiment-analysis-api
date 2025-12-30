@@ -3,8 +3,11 @@ import time
 from typing import Any, Dict, List, Optional
 
 import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
-
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    pipeline,
+)
 from app.config import settings
 from app.core.preprocessing import preprocess_text
 from app.utils.logger import logger
@@ -171,14 +174,21 @@ class SentimentModel:
 
         if not valid_texts:
             # Return neutral predictions for all
-            return [{"text": text, "sentiment": "neutral", "confidence": 0.5} for text in texts]
+            return [
+                {
+                    "text": text,
+                    "sentiment": "neutral",
+                    "confidence": 0.5,
+                }
+                for text in texts
+            ]
 
         # Predict in batches
         batch_size = settings.max_batch_size
         predictions = []
 
         for i in range(0, len(valid_texts), batch_size):
-            batch = valid_texts[i : i + batch_size]
+            batch = valid_texts[i: i + batch_size]
             batch_results = self.classifier(batch)
 
             for j, result in enumerate(batch_results):
@@ -252,7 +262,13 @@ class SentimentModel:
                 result_predictions.append(predictions[prediction_idx])
                 prediction_idx += 1
             else:
-                result_predictions.append({"text": text, "sentiment": "neutral", "confidence": 0.5})
+                result_predictions.append(
+                    {
+                        "text": text,
+                        "sentiment": "neutral",
+                        "confidence": 0.5,
+                    }
+                )
 
         processing_time = (time.time() - start_time) * 1000
 
