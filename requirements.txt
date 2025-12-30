@@ -11,7 +11,7 @@ sentencepiece==0.1.99
 
 # Gradio UI (for HuggingFace Spaces)
 # Note: This file is used directly by HuggingFace Spaces
-gradio==4.44.1
+gradio==5.31.0
 plotly==5.18.0
 
 # Monitoring (API only)
