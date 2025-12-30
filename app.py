@@ -18,7 +18,7 @@ try:
         "sentiment-analysis",
         model=MODEL_NAME,
         token=hf_token if hf_token else None,
-        return_all_scores=True
+        top_k=None  # Returns all scores
     )
     print("✓ Model loaded successfully!")
 except Exception as e:

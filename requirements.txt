@@ -1,21 +1,22 @@
-# Core dependencies
+# Core API dependencies
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.10.5
 pydantic-settings==2.7.1
 
-# ML dependencies
+# ML dependencies (required for both API and HuggingFace Spaces)
 transformers==4.53.0
 torch==2.8.0
 sentencepiece==0.1.99
 
-# Gradio (for HuggingFace Spaces demo)
+# Gradio UI (for HuggingFace Spaces)
+# Note: This file is used directly by HuggingFace Spaces
 gradio==4.44.1
 plotly==5.18.0
 
-# Monitoring
+# Monitoring (API only)
 prometheus-client==0.19.0
 
-# Utilities
+# Utilities (API only)
 python-multipart==0.0.18
 
