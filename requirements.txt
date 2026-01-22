@@ -7,7 +7,7 @@ pydantic-settings==2.7.1
 # ML dependencies (required for both API and HuggingFace Spaces)
 transformers==4.53.0
 torch==2.8.0
-sentencepiece==0.1.99
+sentencepiece==0.2.1
 
 # Gradio UI (for HuggingFace Spaces)
 # Note: This file is used directly by HuggingFace Spaces
